@@ -17,7 +17,7 @@
 | **FR-11** | Must | Provide reproducible local setup instructions. | Environment boots locally using Docker Compose without missing scripts. | Phase 5 / M5 | `docker-compose.yml` & `README.md` | Clean Environment Test | Docker container boot logs | Local port collision rules. | `PLANNED` |
 | **FR-12** | Must | Verify core behavior through automated tests. | Pytest test suite executes and passes 100% of core unit/integration tests. | Phase 5 / M5 | `tests/` | Automated Test Suite | Pytest execution report | Test coverage target percentage. | `PLANNED` |
 | **FR-13** | Must (Completed MVP) | Support idempotent job submission using scoped idempotency keys. | Re-submitting identical payload with same key returns cached job record. | Phase 4 / M4 | `src/sentinel/core/idempotency.py` | API Test | HTTP response header & body comparison | Idempotency key TTL. | `PLANNED` |
-| **FR-14** | Must (Completed MVP) | Provide structured logs for relevant lifecycle events. | JSON-formatted log output contains `job_id`, `state`, and `timestamp`. | Phase 4 / M4 | `src/sentinel/observability/` | Log Inspection Test | Structlog JSON stdout parsing | Context key naming conventions. | `PLANNED` |
+| **FR-14** | Must (Completed MVP) | Provide structured logs for relevant lifecycle events. | JSON-formatted log output contains `job_id`, `state`, and `timestamp`. | Phase 4 / M4 | `src/sentinel/observability/` | Log Inspection Test | Structlog stdout JSON parsing | Context key naming conventions. | `PLANNED` |
 | **FR-15** | Should | Support reproducible performance and reliability experiments. | Locust benchmark executes and reports p50/p95/p99 latency and throughput. | Phase 6 / M6 | `benchmarks/locustfile.py` | Load Test | Locust CSV report & latency graphs | Target target RPS baseline. | `PLANNED` |
 | **FR-16** | Could | Provide an optional web dashboard. | Web interface visualizes worker queues and active jobs. | Post-MVP | `src/sentinel/web/` | Manual Inspection | UI rendering in browser | Choice of framework (FastAPI templates/React). | `PLANNED` |
 
@@ -73,7 +73,7 @@
 
 ### Max Retries & Backoff
 * **Default Attempts**: Initial execution counts as Attempt 1. `max_retries = 3` allows up to 2 retry attempts.
-* **Backoff Strategy**: Exponential backoff with jitter.
+* **Backoff Strategy**: Exponential backoff with jitter ($T = \text{base} \times 2^{\text{attempt}} + \text{jitter}$).
 
 ### Distinction of Lifecycle Boundaries
 1. *Request Accepted*: Validation passes.
@@ -85,7 +85,8 @@
 
 ### Interrupted Job Recovery & Side Effects
 * **Worker Crash Handling**: Workers periodically update a lease heartbeat in Redis. If a lease expires, an operator reconciliation task transitions stalled `RUNNING` jobs back to `QUEUED`.
-* **Idempotency of Tasks**: At-least-once queue delivery implies tasks may run more than once. External side effects MUST implement external idempotency keys or reconciliation safeguards.
+* **Idempotency of Tasks**: At-least-once queue delivery implies tasks may run more than once. External side effects (e.g., payment charges, email dispatches) MUST implement external idempotency keys or reconciliation safeguards.
+
 
 ---
 
@@ -109,26 +110,10 @@ All API endpoints are built with FastAPI, using JSON payloads and returning stan
 * **Purpose**: Accept a supported task type and payload, validate request, enforce idempotency, and durably commit job record.
 * **Authentication**: Required (`Authorization: Bearer <token>`).
 * **Headers**: `Idempotency-Key` (Optional string, scoped per client).
-* **Success Response (`201 Created` or `200 OK` for idempotent replay)**: Returns job ID, status (`QUEUED`), and metadata.
-
-#### 2. `GET /api/v1/jobs/{job_id}` (Get Job Status)
-* **Purpose**: Retrieve current lifecycle state, metadata, result, or sanitized error summary.
-* **Authentication & Ownership**: Required. Returns `404 Not Found` (or `403 Forbidden` masked as 404) if the job belongs to another client.
-
-#### 3. `GET /api/v1/jobs` (List Jobs)
-* **Purpose**: List client jobs with pagination (`limit`, `offset`) and status filtering.
-* **Security**: Strictly scoped to the authenticated client ID.
-
-#### 4. `POST /api/v1/jobs/{job_id}/retry` (Manual Retry)
-* **Purpose**: Manually re-queue an eligible failed job.
-* **Eligibility**: Only jobs in `FAILED` state where `retry_count < max_retries`.
-
-#### 5. `GET /health/live` & `GET /health/ready`
-* **Liveness (`/health/live`)**: Returns `200 OK` if the FastAPI process is running.
-* **Readiness (`/health/ready`)**: Verifies active connections to PostgreSQL and Redis. Returns `200 OK` if both are responsive; `503 Service Unavailable` if either fails.
-
----
-
-### Authentication & Error Contract
-* **Authentication**: Bearer token mapped to a client ID (proposed provisional implementation).
-* **Error Response Format**: Standardized JSON containing error code, message, and timestamp.
+* **Request Schema**:
+  ```json
+  {
+    "task_name": "process_data_batch",
+    "payload": { "batch_id": "b_12345", "source": "s3://bucket/data.csv" },
+    "max_retries": 3
+  }
