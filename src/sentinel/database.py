@@ -1,19 +1,31 @@
-from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
-from sqlalchemy.orm import DeclarativeBase
+from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
+from sqlalchemy.orm import declarative_base
+from sentinel.config import settings
 
-# Default async postgres URL (can be overridden via environment variables)
-DATABASE_URL = "postgresql+asyncpg://postgres:postgres@localhost:5432/sentinel"
-
-async_engine = create_async_engine(DATABASE_URL, echo=False, future=True)
-async_session_maker = async_sessionmaker(
-    async_engine, class_=AsyncSession, expire_on_commit=False
+engine = create_async_engine(
+    settings.database_url,
+    echo=False,
+    future=True,
+    pool_pre_ping=True
 )
 
+AsyncSessionLocal = async_sessionmaker(
+    bind=engine,
+    class_=AsyncSession,
+    expire_on_commit=False,
+    autocommit=False,
+    autoflush=False
+)
 
-class Base(DeclarativeBase):
-    pass
-
+Base = declarative_base()
 
 async def get_db() -> AsyncSession:
-    async with async_session_maker() as session:
-        yield session
+    async with AsyncSessionLocal() as session:
+        try:
+            yield session
+            await session.commit()
+        except Exception:
+            await session.rollback()
+            raise
+        finally:
+            await session.close()
