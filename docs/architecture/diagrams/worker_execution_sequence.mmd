@@ -1,0 +1,19 @@
+sequenceDiagram
+    autonumber
+    participant Redis as Redis / RQ
+    participant Worker as RQ Worker
+    participant DB as PostgreSQL
+
+    Redis->>Worker: Deliver Job Task
+    Worker->>DB: Update Status -> RUNNING (Record Attempt)
+    Worker->>Worker: Execute Task Logic
+    alt Success
+        Worker->>DB: Update Status -> SUCCEEDED (Save Result)
+        Worker->>Redis: Acknowledge Message
+    else Transient Failure / Retry Available
+        Worker->>DB: Update Status -> RETRY_WAIT (Record Error)
+        Worker->>Redis: Schedule Retry
+    else Permanent Failure / Exhausted
+        Worker->>DB: Update Status -> FAILED (Record Terminal Error)
+        Worker->>Redis: Acknowledge Message
+    end

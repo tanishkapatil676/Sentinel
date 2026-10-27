@@ -1,0 +1,11 @@
+graph-nl
+    title Job State Machine - Sentinel
+
+    [*] --> QUEUED: Job Submitted & Enqueued
+    QUEUED --> RUNNING: Worker Claims Job
+    RUNNING --> SUCCEEDED: Task Execution Success
+    RUNNING --> RETRY_WAIT: Transient Failure (Retries Remaining)
+    RUNNING --> FAILED: Permanent Failure or Retries Exhausted
+    RETRY_WAIT --> QUEUED: Backoff Elapsed & Re-enqueued
+    SUCCEEDED --> [*]
+    FAILED --> [*]

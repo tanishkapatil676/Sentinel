@@ -1,0 +1,12 @@
+graph-nl
+    title System Context - Sentinel Platform
+
+    Client[API Client / User] -->|HTTP REST| API[FastAPI Web Server]
+    Developer[Operator / CI] -->|Docker Compose| Infra[Infrastructure]
+
+    subgraph Sentinel Boundary
+        API -->|Async ORM| PG[(PostgreSQL 16)]
+        API -->|Enqueue Task| Redis[(Redis Broker)]
+        Worker[RQ Worker] -->|Fetch/Execute| Redis
+        Worker -->|Update State| PG
+    end

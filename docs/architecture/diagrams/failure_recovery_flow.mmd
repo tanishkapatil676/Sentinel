@@ -1,0 +1,11 @@
+graph-nl
+    title Failure Recovery Flow - Sentinel
+
+    Start([Worker Crash / Network Partition]) --> Detect[Orphaned Job Sweep / Timeout Detection]
+    Detect --> CheckState{Job State?}
+    CheckState -->|Stuck in RUNNING| TimeoutCheck{Exceeded Timeout?}
+    TimeoutCheck -->|Yes| MarkFailed[Transition to FAILED / Retry]
+    TimeoutCheck -->|No| Wait[Continue Waiting]
+    CheckState -->|Stuck in QUEUED (Dispatch Failed)| Requeue[Re-trigger RQ Enqueue]
+    Requeue --> End([System Restored])
+    MarkFailed --> End

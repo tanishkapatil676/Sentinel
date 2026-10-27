@@ -122,3 +122,6 @@ credentials.json
 # Operating system
 .DS_Store
 Thumbs.db
+
+# Redis persistence snapshots and local runtime data
+dump.rdb

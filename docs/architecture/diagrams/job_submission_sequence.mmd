@@ -1,0 +1,13 @@
+sequenceDiagram
+    autonumber
+    actor Client
+    participant API as FastAPI API
+    participant DB as PostgreSQL
+    participant Redis as Redis / RQ
+
+    Client->>API: POST /jobs (Payload & Idempotency Key)
+    API->>DB: Check Idempotency & Insert Job (QUEUED)
+    DB-->>API: Job Record Committed
+    API->>Redis: Enqueue Task ID
+    Redis-->>API: Enqueued Successfully
+    API-->>Client: 201 Created (Job ID, Status: QUEUED)

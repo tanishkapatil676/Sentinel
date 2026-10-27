@@ -1,0 +1,21 @@
+graph-nl
+    title Component Architecture - Sentinel
+
+    subgraph API Process
+        Router[API Routers (/jobs)] --> Service[Job Service Layer]
+        Service --> Schema[Pydantic Validation Schemas]
+        Service --> DBAdapter[(SQLAlchemy Async Session)]
+        Service --> QueueAdapter[RQ Queue Client]
+    end
+
+    subgraph Worker Process
+        WorkerMain[RQ Worker Loop] --> TaskExec[Task Handlers]
+        TaskExec --> DBAdapterWorker[(SQLAlchemy Async Session)]
+    end
+
+    subgraph Infrastructure
+        DBAdapter -->|asyncpg| PostgreSQL[(PostgreSQL 16)]
+        DBAdapterWorker -->|asyncpg| PostgreSQL
+        QueueAdapter -->|TCP| Redis[(Redis Broker)]
+        WorkerMain -->|TCP| Redis
+    end
