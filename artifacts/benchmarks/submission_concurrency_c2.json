@@ -1,0 +1,96 @@
+{
+  "timestamp": "2026-10-27T04:24:04.852323+00:00",
+  "api_url": "http://127.0.0.1:8000",
+  "total_jobs": 10,
+  "concurrency": 2,
+  "timeout_seconds": 30.0,
+  "poll_interval_seconds": 0.5,
+  "duration_seconds": 14.48217255200052,
+  "throughput_jobs_per_sec": 0.6905041328635898,
+  "completed": 10,
+  "failed": 0,
+  "timed_out": 0,
+  "errors": 0,
+  "results": [
+    {
+      "submission_timestamp": "2026-10-27T04:23:50.370028+00:00",
+      "job_id": "9d38e2a7-4718-4a0f-aca0-4b607c4d909a",
+      "status": "COMPLETED",
+      "api_latency_ms": 202.430811999875,
+      "e2e_latency_ms": 3056.9105859995034,
+      "error": null
+    },
+    {
+      "submission_timestamp": "2026-10-27T04:23:50.404590+00:00",
+      "job_id": "21e0ecaa-3b89-4aa3-915a-5f655f081780",
+      "status": "COMPLETED",
+      "api_latency_ms": 120.28472099973442,
+      "e2e_latency_ms": 1843.8008080001964,
+      "error": null
+    },
+    {
+      "submission_timestamp": "2026-10-27T04:23:52.251805+00:00",
+      "job_id": "b9ebe949-dae8-4127-b814-538d1e079d89",
+      "status": "COMPLETED",
+      "api_latency_ms": 154.94860499984497,
+      "e2e_latency_ms": 2508.6215539995464,
+      "error": null
+    },
+    {
+      "submission_timestamp": "2026-10-27T04:23:53.426983+00:00",
+      "job_id": "9cd88c8b-7dd1-4641-bedb-4a24732961d6",
+      "status": "COMPLETED",
+      "api_latency_ms": 149.8082689995499,
+      "e2e_latency_ms": 2538.8070509998215,
+      "error": null
+    },
+    {
+      "submission_timestamp": "2026-10-27T04:23:54.760470+00:00",
+      "job_id": "b66ec97f-32c3-408f-95cd-55ca58367d12",
+      "status": "COMPLETED",
+      "api_latency_ms": 116.1025219998919,
+      "e2e_latency_ms": 3185.7330719994934,
+      "error": null
+    },
+    {
+      "submission_timestamp": "2026-10-27T04:23:55.965848+00:00",
+      "job_id": "6580c92b-0400-4eda-8101-cd1679f187ef",
+      "status": "COMPLETED",
+      "api_latency_ms": 321.37611899997864,
+      "e2e_latency_ms": 3655.0670910000918,
+      "error": null
+    },
+    {
+      "submission_timestamp": "2026-10-27T04:23:57.946243+00:00",
+      "job_id": "fdaae5f9-8909-417b-bed4-cb0eb0ab9349",
+      "status": "COMPLETED",
+      "api_latency_ms": 252.94836400007625,
+      "e2e_latency_ms": 3280.1432599999316,
+      "error": null
+    },
+    {
+      "submission_timestamp": "2026-10-27T04:23:59.620959+00:00",
+      "job_id": "00751e82-b9c0-4e96-a35a-7f4c33592780",
+      "status": "COMPLETED",
+      "api_latency_ms": 139.04008400004386,
+      "e2e_latency_ms": 2906.9723069997053,
+      "error": null
+    },
+    {
+      "submission_timestamp": "2026-10-27T04:24:01.226424+00:00",
+      "job_id": "8673b51d-7e5d-4ba4-b425-6bff27421ce1",
+      "status": "COMPLETED",
+      "api_latency_ms": 108.51557599926309,
+      "e2e_latency_ms": 2332.659603999673,
+      "error": null
+    },
+    {
+      "submission_timestamp": "2026-10-27T04:24:02.527979+00:00",
+      "job_id": "ff7a7668-280f-4fc2-97ba-9fa12377b56f",
+      "status": "COMPLETED",
+      "api_latency_ms": 116.09389200020814,
+      "e2e_latency_ms": 2323.964862000139,
+      "error": null
+    }
+  ]
+}
