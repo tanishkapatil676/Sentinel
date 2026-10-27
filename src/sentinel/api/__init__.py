@@ -1,1 +1,1 @@
-"""Sentinel API package."""
+"""Sentinel API routes."""
